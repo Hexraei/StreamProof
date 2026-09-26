@@ -67,7 +67,7 @@ export function BundleView({ bundle, counts, pendingBlocked }: Props) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <pre className="max-h-[460px] overflow-auto rounded-xl bg-[#0f2620] p-4 font-mono text-xs leading-relaxed text-[#c9ebe0]">{json}</pre>
+            <pre className="max-h-[460px] overflow-auto rounded-lg bg-[#0f2620] p-4 font-mono text-xs leading-relaxed text-[#c9ebe0]">{json}</pre>
           </CardContent>
         </Card>
       )}

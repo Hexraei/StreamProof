@@ -77,11 +77,9 @@ export default function App() {
   );
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[640px] flex-col bg-background shadow-2xl shadow-primary-ink/10 min-[900px]:max-w-[1024px] min-[1280px]:max-w-[1280px]">
-      <header className="sticky top-0 z-20 flex items-center gap-3 bg-gradient-to-br from-primary-deep via-primary to-aqua px-5 py-4 text-white shadow-lg shadow-primary/30 min-[900px]:px-7 min-[900px]:py-5">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/30 bg-white/15">
-          <Droplets size={22} strokeWidth={2.2} />
-        </span>
+    <div className="mx-auto flex min-h-dvh w-full max-w-[640px] flex-col bg-background min-[900px]:max-w-[1024px] min-[900px]:border-x min-[900px]:border-line min-[1280px]:max-w-[1280px]">
+      <header className="sticky top-0 z-20 flex items-center gap-3 border-b-4 border-aqua bg-primary-deep px-5 py-4 text-white min-[900px]:px-7 min-[900px]:py-5">
+        <Droplets size={26} strokeWidth={2.2} className="shrink-0 text-aqua" />
         <div>
           <h1 className="font-display text-[22px] font-extrabold tracking-tight min-[900px]:text-2xl">StreamProof</h1>
           <p className="text-[13px] leading-snug text-white/85">
@@ -90,7 +88,7 @@ export default function App() {
         </div>
       </header>
 
-      <nav aria-label="Workflow steps" className="mx-4 mt-4 grid grid-cols-2 gap-1.5 rounded-2xl border border-line bg-card p-1.5 shadow-sm min-[560px]:grid-cols-4 min-[900px]:mx-7">
+      <nav aria-label="Workflow steps" className="mx-4 mt-4 grid grid-cols-2 gap-1 rounded-lg border border-line bg-card p-1 min-[560px]:grid-cols-4 min-[900px]:mx-7">
         {STEPS.map((s, i) => {
           const Icon = s.icon;
           const active = step === s.id;
@@ -99,8 +97,8 @@ export default function App() {
               key={s.id}
               onClick={() => setStep(s.id)}
               className={cn(
-                'relative flex items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-[13px] font-semibold transition-colors',
-                active ? 'bg-primary text-white shadow-md shadow-primary/30' : 'text-muted hover:bg-primary-soft hover:text-primary-deep'
+                'relative flex items-center justify-center gap-1.5 rounded-md px-2 py-2.5 text-[13px] font-semibold transition-colors',
+                active ? 'bg-primary-deep text-white' : 'text-muted hover:bg-primary-soft hover:text-primary-deep'
               )}
             >
               <span className={cn('font-display text-[11px] font-bold', active ? 'text-white/75' : 'text-muted/60')}>{i + 1}</span>
@@ -176,7 +174,7 @@ function CsvImport({ onImport, skipped }: { onImport: (text: string) => void; sk
   return (
     <div className="flex flex-col gap-3">
       <p className="text-[13px] text-muted">
-        Expected columns: <code className="rounded-md bg-primary-soft px-1.5 py-0.5 font-mono text-[11px] text-primary-ink break-all">{CSV_HEADER}</code>
+        Expected columns: <code className="rounded bg-primary-soft px-1.5 py-0.5 font-mono text-[11px] text-primary-ink break-all">{CSV_HEADER}</code>
       </p>
       <input
         type="file"
@@ -185,7 +183,7 @@ function CsvImport({ onImport, skipped }: { onImport: (text: string) => void; sk
           const f = e.target.files?.[0];
           if (f) onImport(await f.text());
         }}
-        className="w-full min-w-0 cursor-pointer rounded-xl border-[1.5px] border-dashed border-line bg-primary-soft/50 px-3.5 py-3 text-sm text-ink2 file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
+        className="w-full min-w-0 cursor-pointer rounded-lg border-[1.5px] border-dashed border-line bg-primary-soft/50 px-3.5 py-3 text-sm text-ink2 file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
       />
       <details className="group">
         <summary className="cursor-pointer text-sm font-semibold text-primary-deep">or paste CSV text</summary>

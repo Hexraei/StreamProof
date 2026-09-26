@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Sora", "Inter", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --color-background: #f2f6f4;
   --color-card: #ffffff;
   --color-ink: #12201c;
   --color-ink2: #2b3f39;
   --color-muted: #5f726c;
-  --color-line: #dce8e3;
+  --color-line: #c9dcd4;
 
   --color-primary: #0e7c66;
   --color-primary-deep: #0a5f4f;
@@ -38,3 +38,5 @@ body {
 }
 button { -webkit-tap-highlight-color: transparent; }
 button:active { transform: scale(0.98); }
+
+code, pre, .font-mono { font-family: "IBM Plex Mono", ui-monospace, monospace !important; }
