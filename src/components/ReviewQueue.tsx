@@ -1,11 +1,9 @@
-import { OctagonAlert, TriangleAlert, ListChecks, MapPin, Calendar, Check, X, User, Inbox } from 'lucide-react';
+import { ListChecks, MapPin, Calendar, Check, X, User, Inbox } from 'lucide-react';
 import type { RawObservation, ReviewedObservation, ReviewStatus } from '../lib/types';
 import { canApprove } from '../lib/validate';
 import { PARAMETER_LABELS } from '../lib/types';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
-import { Badge } from './ui/badge';
-import { Alert } from './ui/alert';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
@@ -22,6 +20,12 @@ const accent: Record<ReviewStatus, string> = {
   pending: 'border-l-warn',
   approved: 'border-l-ok',
   rejected: 'border-l-bad opacity-80',
+};
+
+const statusDot: Record<ReviewStatus, string> = {
+  pending: 'bg-warn',
+  approved: 'bg-ok',
+  rejected: 'bg-bad',
 };
 
 export function ReviewQueue({ records, onUpdate, onSetStatus, onRemove }: Props) {
@@ -50,34 +54,47 @@ export function ReviewQueue({ records, onUpdate, onSetStatus, onRemove }: Props)
       </Card>
       {records.map((rec) => {
         const approvable = canApprove(rec.issues);
+        const sourceNote =
+          rec.source === 'manual' ? 'typed in' : rec.source === 'csv' ? 'from CSV' : rec.source === 'reference-sample' ? 'reference sample' : 'synthetic demo';
         return (
           <Card key={rec.id} className={cn('border-l-4', accent[rec.status])}>
             <CardContent className="flex flex-col gap-3 py-4">
-              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+              <div className="flex items-center gap-2">
                 <strong className="font-display text-[15px]">{PARAMETER_LABELS[rec.parameter]}</strong>
-                <span className="inline-flex items-center gap-1 text-[13px] text-ink2">
+                <span className="text-xs text-muted">{sourceNote}</span>
+                <span className="ml-auto inline-flex items-center gap-1.5 text-xs text-muted">
+                  <span className={cn('h-1.5 w-1.5 rounded-full', statusDot[rec.status])} />
+                  {rec.status}
+                </span>
+              </div>
+              <div className="flex items-center gap-x-3 gap-y-1 text-[13px] text-ink2">
+                <span className="inline-flex items-center gap-1">
                   <MapPin size={12} className="text-muted" /> {rec.siteName || 'no site'}
                 </span>
                 <span className="inline-flex items-center gap-1 text-xs text-muted">
                   <Calendar size={12} /> {rec.observedAt ? rec.observedAt.replace('T', ' ') : 'no date'}
                 </span>
-                <Badge variant={rec.status}>{rec.status}</Badge>
-                {rec.source !== 'manual' && rec.source !== 'csv' && (
-                  <Badge variant="violet">{rec.source === 'reference-sample' ? 'reference' : 'synthetic'}</Badge>
-                )}
               </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <Label>
+              <div className="flex items-end gap-2.5">
+                <Label className="flex-1">
                   Value
                   <Input
+                    className="h-12 font-display text-2xl font-bold tracking-tight"
                     value={rec.value ?? ''}
                     onChange={(e) => onUpdate(rec.id, { value: e.target.value === '' ? null : Number(e.target.value) })}
                   />
                 </Label>
-                <Label>
+                <Label className="w-28 shrink-0">
                   Unit
-                  <Input value={rec.unit} onChange={(e) => onUpdate(rec.id, { unit: e.target.value })} />
+                  <Input
+                    className={cn('h-12', rec.unit === '' && 'border-dashed text-muted italic placeholder:text-muted placeholder:italic')}
+                    placeholder={rec.unit === '' ? 'missing' : undefined}
+                    value={rec.unit}
+                    onChange={(e) => onUpdate(rec.id, { unit: e.target.value })}
+                  />
                 </Label>
+              </div>
+              <div className="grid grid-cols-2 gap-2.5">
                 <Label>
                   Observer
                   <Input value={rec.observer} onChange={(e) => onUpdate(rec.id, { observer: e.target.value })} />
@@ -98,12 +115,20 @@ export function ReviewQueue({ records, onUpdate, onSetStatus, onRemove }: Props)
                 </Label>
               </div>
               {rec.issues.length > 0 && (
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1.5 border-t border-line pt-2.5">
                   {rec.issues.map((iss, i) => (
-                    <Alert key={i} variant={iss.severity === 'error' ? 'destructive' : 'warning'}>
-                      {iss.severity === 'error' ? <OctagonAlert size={15} /> : <TriangleAlert size={15} />}
-                      <span><strong className="text-[11px] font-extrabold uppercase tracking-wide">{iss.severity === 'error' ? 'Blocked' : 'Check'}</strong>{' - '}{iss.message}</span>
-                    </Alert>
+                    <p
+                      key={i}
+                      className={cn(
+                        'border-l-[3px] py-0.5 pl-2.5 text-[13px] leading-snug text-ink',
+                        iss.severity === 'error' ? 'border-l-bad' : 'border-l-warn'
+                      )}
+                    >
+                      <strong className={cn('font-bold', iss.severity === 'error' ? 'text-bad' : 'text-warn')}>
+                        {iss.severity === 'error' ? 'Blocked:' : 'Check:'}
+                      </strong>{' '}
+                      {iss.message}
+                    </p>
                   ))}
                 </div>
               )}
