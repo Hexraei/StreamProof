@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { PlusCircle } from 'lucide-react';
 import type { Parameter, RawObservation } from '../lib/types';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const PARAMS: { value: Parameter; label: string; unitHint: string }[] = [
   { value: 'ph', label: 'pH', unitHint: 'pH' },
@@ -37,54 +41,57 @@ export function ObservationForm({ onAdd }: { onAdd: (rec: Omit<RawObservation, '
   };
 
   return (
-    <div className="form">
-      <label>
+    <div className="grid gap-3.5">
+      <Label>
         Where was the water measured?
-        <input value={siteName} onChange={(e) => setSiteName(e.target.value)} placeholder="e.g. Adyar River, near the footbridge" />
-      </label>
-      <div className="row">
-        <label>
+        <Input value={siteName} onChange={(e) => setSiteName(e.target.value)} placeholder="e.g. Adyar River, near the footbridge" />
+      </Label>
+      <div className="grid grid-cols-2 gap-3">
+        <Label>
           When?
-          <input type="datetime-local" value={observedAt} onChange={(e) => setObservedAt(e.target.value)} />
-        </label>
-        <label>
+          <Input type="datetime-local" value={observedAt} onChange={(e) => setObservedAt(e.target.value)} />
+        </Label>
+        <Label>
           Who measured it?
-          <input value={observer} onChange={(e) => setObserver(e.target.value)} placeholder="e.g. Meena / Green Club" />
-        </label>
+          <Input value={observer} onChange={(e) => setObserver(e.target.value)} placeholder="e.g. Meena / Green Club" />
+        </Label>
       </div>
-      <label>
+      <Label>
         What was measured?
-        <select
+        <Select
           value={parameter}
-          onChange={(e) => {
-            const p = e.target.value as Parameter;
-            setParameter(p);
-            setUnit(PARAMS.find((x) => x.value === p)!.unitHint);
+          onValueChange={(p) => {
+            const param = p as Parameter;
+            setParameter(param);
+            setUnit(PARAMS.find((x) => x.value === param)!.unitHint);
           }}
         >
-          {PARAMS.map((p) => (
-            <option key={p.value} value={p.value}>{p.label}</option>
-          ))}
-        </select>
-      </label>
-      <div className="row">
-        <label>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {PARAMS.map((p) => (
+              <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Label>
+      <div className="grid grid-cols-2 gap-3">
+        <Label>
           Value
-          <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="e.g. 7.2" inputMode="decimal" />
-        </label>
-        <label>
+          <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder="e.g. 7.2" inputMode="decimal" />
+        </Label>
+        <Label>
           Unit
-          <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder={PARAMS.find((x) => x.value === parameter)!.unitHint} />
-        </label>
+          <Input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder={PARAMS.find((x) => x.value === parameter)!.unitHint} />
+        </Label>
       </div>
-      <label>
+      <Label>
         Notes (optional)
-        <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything a reviewer should know" />
-      </label>
-      <button onClick={submit}>
-        <PlusCircle size={17} strokeWidth={2.4} />
+        <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything a reviewer should know" />
+      </Label>
+      <Button onClick={submit} className="mt-1">
+        <PlusCircle size={16} strokeWidth={2.4} />
         {added ? 'Added - check the Review step' : 'Add measurement'}
-      </button>
+      </Button>
     </div>
   );
 }

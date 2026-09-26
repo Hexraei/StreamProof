@@ -12,6 +12,10 @@ import { ObservationForm } from './components/ObservationForm';
 import { ReviewQueue } from './components/ReviewQueue';
 import { MappingPreview } from './components/MappingPreview';
 import { BundleView } from './components/BundleView';
+import { Button } from './components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './components/ui/card';
+import { Textarea } from './components/ui/textarea';
+import { cn } from './lib/utils';
 
 let counter = 0;
 const makeId = () => `obs-${Date.now().toString(36)}-${++counter}`;
@@ -32,10 +36,7 @@ export default function App() {
 
   const reviewed = useMemo(() => {
     const raws = records.map(({ status: _s, issues: _i, ...raw }) => raw);
-    return records.map((rec) => ({
-      ...rec,
-      issues: validateObservation(rec, raws),
-    }));
+    return records.map((rec) => ({ ...rec, issues: validateObservation(rec, raws) }));
   }, [records]);
 
   const counts = useMemo(() => {
@@ -43,32 +44,21 @@ export default function App() {
     for (const r of reviewed) {
       if (r.status === 'approved') c.approved++;
       else if (r.status === 'rejected') c.rejected++;
-      else {
-        c.pending++;
-        if (!canApprove(r.issues)) c.blocked++;
-      }
+      else { c.pending++; if (!canApprove(r.issues)) c.blocked++; }
     }
     return c;
   }, [reviewed]);
 
   const addRecords = (raws: RawObservation[]) => {
-    setRecords((prev) => [
-      ...prev,
-      ...raws.map((r) => ({ ...r, status: 'pending' as ReviewStatus, issues: [] })),
-    ]);
+    setRecords((prev) => [...prev, ...raws.map((r) => ({ ...r, status: 'pending' as ReviewStatus, issues: [] }))]);
   };
-
   const updateRecord = (id: string, patch: Partial<RawObservation>) => {
     setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch, status: 'pending' as ReviewStatus } : r)));
   };
-
   const setStatus = (id: string, status: ReviewStatus) => {
     setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
   };
-
-  const removeRecord = (id: string) => {
-    setRecords((prev) => prev.filter((r) => r.id !== id));
-  };
+  const removeRecord = (id: string) => setRecords((prev) => prev.filter((r) => r.id !== id));
 
   const importCsv = (text: string) => {
     const { records: raws, skipped } = csvToObservations(text, 'csv', makeId);
@@ -87,79 +77,90 @@ export default function App() {
   );
 
   return (
-    <div className="app">
-      <header className="topbar">
-        <span className="logo-mark"><Droplets size={22} strokeWidth={2.2} /></span>
+    <div className="mx-auto flex min-h-dvh w-full max-w-[640px] flex-col bg-background shadow-2xl shadow-primary-ink/10 min-[900px]:max-w-[1080px]">
+      <header className="sticky top-0 z-20 flex items-center gap-3 bg-gradient-to-br from-primary-deep via-primary to-aqua px-5 py-4 text-white shadow-lg shadow-primary/30 min-[900px]:px-7 min-[900px]:py-5">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/30 bg-white/15">
+          <Droplets size={22} strokeWidth={2.2} />
+        </span>
         <div>
-          <h1 className="logo">StreamProof</h1>
-          <p className="tagline">
+          <h1 className="font-display text-[22px] font-extrabold tracking-tight min-[900px]:text-2xl">StreamProof</h1>
+          <p className="text-[13px] leading-snug text-white/85">
             Citizen stream measurements in. Standards-ready health data out. Guesses stopped at the gate.
           </p>
         </div>
       </header>
 
-      <nav className="steps" aria-label="Workflow steps">
+      <nav aria-label="Workflow steps" className="mx-4 mt-4 grid grid-cols-2 gap-1.5 rounded-2xl border border-line bg-card p-1.5 shadow-sm min-[560px]:grid-cols-4 min-[900px]:mx-7">
         {STEPS.map((s, i) => {
           const Icon = s.icon;
+          const active = step === s.id;
           return (
             <button
               key={s.id}
-              className={step === s.id ? 'step active' : 'step'}
               onClick={() => setStep(s.id)}
+              className={cn(
+                'relative flex items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-[13px] font-semibold transition-colors',
+                active ? 'bg-primary text-white shadow-md shadow-primary/30' : 'text-muted hover:bg-primary-soft hover:text-primary-deep'
+              )}
             >
-              <span className="n">{i + 1}</span>
-              <Icon size={15} strokeWidth={2.4} />
-              {s.label}
-              {s.id === 'review' && counts.pending > 0 && <span className="badge">{counts.pending}</span>}
+              <span className={cn('font-display text-[11px] font-bold', active ? 'text-white/75' : 'text-muted/60')}>{i + 1}</span>
+              <Icon size={14} strokeWidth={2.4} />
+              <span className="truncate">{s.label}</span>
+              {s.id === 'review' && counts.pending > 0 && (
+                <span className="grid h-5 min-w-5 place-items-center rounded-full bg-bad px-1 text-[11px] font-bold text-white">
+                  {counts.pending}
+                </span>
+              )}
             </button>
           );
         })}
       </nav>
 
-      <main>
+      <main className="flex flex-1 flex-col gap-4 px-4 py-4 pb-10 min-[900px]:px-7 min-[900px]:py-5">
         {step === 'add' && (
-          <section>
-            <div className="panel">
-              <h2><PencilLine size={19} className="ic" /> Add one measurement</h2>
-              <ObservationForm onAdd={(r) => addRecords([{ ...r, id: makeId() }])} />
-            </div>
-            <div className="panel">
-              <h2><Upload size={19} className="ic" /> Import a CSV file</h2>
-              <CsvImport onImport={importCsv} skipped={skippedRows} />
-            </div>
-            <div className="panel">
-              <h2><FlaskConical size={19} className="ic" /> Try it with sample data</h2>
-              <p>
-                Two labelled sets: a real published reference record from the OneAquaHealth draft
-                guide (historical, not fresh data), and an invented set full of mistakes so you can
-                watch the gate catch them.
-              </p>
-              <div className="btn-row">
-                <button onClick={() => addRecords(referenceSample(makeId))}>Load the real reference record</button>
-                <button className="secondary" onClick={() => addRecords(syntheticSample(makeId))}>Load the flawed synthetic set</button>
-              </div>
-            </div>
-          </section>
+          <div className="grid items-start gap-4 min-[900px]:grid-cols-[3fr_2fr]">
+            <Card className="min-[900px]:row-span-2">
+              <CardHeader>
+                <CardTitle><PencilLine size={18} className="text-primary" /> Add one measurement</CardTitle>
+                <CardDescription>Type in what was measured at the water body. A reviewer checks it before anything is shared.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ObservationForm onAdd={(r) => addRecords([{ ...r, id: makeId() }])} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle><Upload size={18} className="text-primary" /> Import a CSV file</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CsvImport onImport={importCsv} skipped={skippedRows} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle><FlaskConical size={18} className="text-primary" /> Try it with sample data</CardTitle>
+                <CardDescription>
+                  Two labelled sets: a real published reference record from the OneAquaHealth draft guide
+                  (historical, not fresh data), and an invented set full of mistakes so you can watch the gate catch them.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-2.5">
+                <Button onClick={() => addRecords(referenceSample(makeId))}>Load the real reference record</Button>
+                <Button variant="secondary" onClick={() => addRecords(syntheticSample(makeId))}>Load the flawed synthetic set</Button>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {step === 'review' && (
-          <ReviewQueue
-            records={reviewed}
-            onUpdate={updateRecord}
-            onSetStatus={setStatus}
-            onRemove={removeRecord}
-          />
+          <ReviewQueue records={reviewed} onUpdate={updateRecord} onSetStatus={setStatus} onRemove={removeRecord} />
         )}
-
         {step === 'mapping' && <MappingPreview records={reviewed} />}
-
-        {step === 'export' && (
-          <BundleView bundle={bundle} counts={counts} pendingBlocked={counts.blocked} />
-        )}
+        {step === 'export' && <BundleView bundle={bundle} counts={counts} pendingBlocked={counts.blocked} />}
       </main>
 
-      <footer>
-        <ShieldCheck size={15} />
+      <footer className="flex items-start gap-2 border-t border-line px-5 py-4 text-xs text-muted min-[900px]:px-7">
+        <ShieldCheck size={14} className="mt-0.5 shrink-0 text-primary" />
         <span>
           Prototype aligned with the OneAquaHealth draft FHIR Implementation Guide (a draft that can
           change). It is not a formal standards-conformance claim. Built for the OneAquaHealth IEEE
@@ -170,18 +171,12 @@ export default function App() {
   );
 }
 
-function CsvImport({
-  onImport,
-  skipped,
-}: {
-  onImport: (text: string) => void;
-  skipped: { row: number; reason: string }[];
-}) {
+function CsvImport({ onImport, skipped }: { onImport: (text: string) => void; skipped: { row: number; reason: string }[] }) {
   const [text, setText] = useState('');
   return (
-    <div>
-      <p className="hint">
-        Expected columns: <code>{CSV_HEADER}</code>
+    <div className="flex flex-col gap-3">
+      <p className="text-[13px] text-muted">
+        Expected columns: <code className="rounded-md bg-primary-soft px-1.5 py-0.5 font-mono text-[11px] text-primary-ink break-all">{CSV_HEADER}</code>
       </p>
       <input
         type="file"
@@ -190,24 +185,25 @@ function CsvImport({
           const f = e.target.files?.[0];
           if (f) onImport(await f.text());
         }}
+        className="w-full min-w-0 cursor-pointer rounded-xl border-[1.5px] border-dashed border-line bg-primary-soft/50 px-3.5 py-3 text-sm text-ink2 file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
       />
-      <details>
-        <summary>or paste CSV text</summary>
-        <textarea
-          rows={5}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={`${CSV_HEADER}\nMy Stream,2026-09-20T09:15:00Z,pH,7.2,pH,Meena,measured,clear day,,`}
-        />
-        <button className="secondary" onClick={() => onImport(text)}>
-          <Import size={15} strokeWidth={2.4} /> Import pasted text
-        </button>
+      <details className="group">
+        <summary className="cursor-pointer text-sm font-semibold text-primary-deep">or paste CSV text</summary>
+        <div className="mt-2 flex flex-col gap-2">
+          <Textarea
+            rows={5}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder={`${CSV_HEADER}\nMy Stream,2026-09-20T09:15:00Z,pH,7.2,pH,Meena,measured,clear day,,`}
+          />
+          <Button variant="secondary" size="sm" onClick={() => onImport(text)} className="self-start">
+            <Import size={14} strokeWidth={2.4} /> Import pasted text
+          </Button>
+        </div>
       </details>
       {skipped.length > 0 && (
-        <ul className="skipped">
-          {skipped.map((s, i) => (
-            <li key={i}>Row {s.row}: {s.reason}</li>
-          ))}
+        <ul className="list-disc pl-5 text-[13px] text-warn">
+          {skipped.map((s, i) => (<li key={i}>Row {s.row}: {s.reason}</li>))}
         </ul>
       )}
     </div>
