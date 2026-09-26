@@ -17,7 +17,7 @@ const ROWS: { from: string; to: string; why: string }[] = [
 export function MappingPreview({ records }: { records: ReviewedObservation[] }) {
   const approved = records.filter((r) => r.status === 'approved');
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid items-start gap-4 min-[1100px]:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle><ArrowLeftRight size={18} className="text-primary" /> How a citizen record becomes a standards record</CardTitle>

@@ -77,7 +77,7 @@ export default function App() {
   );
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[640px] flex-col bg-background shadow-2xl shadow-primary-ink/10 min-[900px]:max-w-[1080px]">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[640px] flex-col bg-background shadow-2xl shadow-primary-ink/10 min-[900px]:max-w-[1024px] min-[1280px]:max-w-[1280px]">
       <header className="sticky top-0 z-20 flex items-center gap-3 bg-gradient-to-br from-primary-deep via-primary to-aqua px-5 py-4 text-white shadow-lg shadow-primary/30 min-[900px]:px-7 min-[900px]:py-5">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/30 bg-white/15">
           <Droplets size={22} strokeWidth={2.2} />

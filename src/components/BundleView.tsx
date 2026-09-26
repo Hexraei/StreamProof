@@ -31,7 +31,7 @@ export function BundleView({ bundle, counts, pendingBlocked }: Props) {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid items-start gap-4 min-[1100px]:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle><FileDown size={18} className="text-primary" /> Export summary</CardTitle>
