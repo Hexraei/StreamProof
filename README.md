@@ -1,5 +1,7 @@
 # StreamProof
 
+**Live demo:** https://stream-proof.vercel.app/
+
 **Citizens measure stream water. StreamProof turns the trustworthy measurements into standards-ready health data - and stops everything else at the gate.**
 
 Built for the **OneAquaHealth IEEE Global Hackathon 2026, Track 7 (Digital Health Standards)**.
