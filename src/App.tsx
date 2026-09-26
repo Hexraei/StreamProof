@@ -1,24 +1,28 @@
 import { useMemo, useState } from 'react';
+import {
+  Droplets, PencilLine, ListChecks, ArrowLeftRight, FileDown,
+  Upload, FlaskConical, ShieldCheck, Import,
+} from 'lucide-react';
 import type { RawObservation, ReviewedObservation, ReviewStatus } from './lib/types';
 import { validateObservation, canApprove } from './lib/validate';
 import { csvToObservations, CSV_HEADER } from './lib/csv';
 import { referenceSample, syntheticSample } from './lib/samples';
 import { buildBundle } from './lib/fhir';
-import ObservationForm from './components/ObservationForm';
-import ReviewQueue from './components/ReviewQueue';
-import MappingPreview from './components/MappingPreview';
-import BundleView from './components/BundleView';
+import { ObservationForm } from './components/ObservationForm';
+import { ReviewQueue } from './components/ReviewQueue';
+import { MappingPreview } from './components/MappingPreview';
+import { BundleView } from './components/BundleView';
 
 let counter = 0;
 const makeId = () => `obs-${Date.now().toString(36)}-${++counter}`;
 
 type Step = 'add' | 'review' | 'mapping' | 'export';
 
-const STEPS: { id: Step; label: string }[] = [
-  { id: 'add', label: '1. Add data' },
-  { id: 'review', label: '2. Review' },
-  { id: 'mapping', label: '3. See the mapping' },
-  { id: 'export', label: '4. Export' },
+const STEPS: { id: Step; label: string; icon: typeof PencilLine }[] = [
+  { id: 'add', label: 'Add data', icon: PencilLine },
+  { id: 'review', label: 'Review', icon: ListChecks },
+  { id: 'mapping', label: 'Mapping', icon: ArrowLeftRight },
+  { id: 'export', label: 'Export', icon: FileDown },
 ];
 
 export default function App() {
@@ -84,46 +88,56 @@ export default function App() {
 
   return (
     <div className="app">
-      <header>
-        <h1>StreamProof</h1>
-        <p className="tagline">
-          Citizen stream measurements in. Standards-ready health data out. Guesses stopped at the gate.
-        </p>
+      <header className="topbar">
+        <span className="logo-mark"><Droplets size={22} strokeWidth={2.2} /></span>
+        <div>
+          <h1 className="logo">StreamProof</h1>
+          <p className="tagline">
+            Citizen stream measurements in. Standards-ready health data out. Guesses stopped at the gate.
+          </p>
+        </div>
       </header>
 
-      <nav className="steps">
-        {STEPS.map((s) => (
-          <button
-            key={s.id}
-            className={step === s.id ? 'step active' : 'step'}
-            onClick={() => setStep(s.id)}
-          >
-            {s.label}
-            {s.id === 'review' && counts.pending > 0 && <span className="badge">{counts.pending}</span>}
-          </button>
-        ))}
+      <nav className="steps" aria-label="Workflow steps">
+        {STEPS.map((s, i) => {
+          const Icon = s.icon;
+          return (
+            <button
+              key={s.id}
+              className={step === s.id ? 'step active' : 'step'}
+              onClick={() => setStep(s.id)}
+            >
+              <span className="n">{i + 1}</span>
+              <Icon size={15} strokeWidth={2.4} />
+              {s.label}
+              {s.id === 'review' && counts.pending > 0 && <span className="badge">{counts.pending}</span>}
+            </button>
+          );
+        })}
       </nav>
 
       <main>
         {step === 'add' && (
           <section>
             <div className="panel">
-              <h2>Add one measurement</h2>
+              <h2><PencilLine size={19} className="ic" /> Add one measurement</h2>
               <ObservationForm onAdd={(r) => addRecords([{ ...r, id: makeId() }])} />
             </div>
             <div className="panel">
-              <h2>Import a CSV file</h2>
+              <h2><Upload size={19} className="ic" /> Import a CSV file</h2>
               <CsvImport onImport={importCsv} skipped={skippedRows} />
             </div>
             <div className="panel">
-              <h2>Try it with sample data</h2>
+              <h2><FlaskConical size={19} className="ic" /> Try it with sample data</h2>
               <p>
                 Two labelled sets: a real published reference record from the OneAquaHealth draft
                 guide (historical, not fresh data), and an invented set full of mistakes so you can
                 watch the gate catch them.
               </p>
-              <button onClick={() => addRecords(referenceSample(makeId))}>Load the real reference record</button>{' '}
-              <button onClick={() => addRecords(syntheticSample(makeId))}>Load the flawed synthetic set</button>
+              <div className="btn-row">
+                <button onClick={() => addRecords(referenceSample(makeId))}>Load the real reference record</button>
+                <button className="secondary" onClick={() => addRecords(syntheticSample(makeId))}>Load the flawed synthetic set</button>
+              </div>
             </div>
           </section>
         )}
@@ -145,11 +159,12 @@ export default function App() {
       </main>
 
       <footer>
-        <p>
+        <ShieldCheck size={15} />
+        <span>
           Prototype aligned with the OneAquaHealth draft FHIR Implementation Guide (a draft that can
           change). It is not a formal standards-conformance claim. Built for the OneAquaHealth IEEE
           Global Hackathon 2026, Track 7.
-        </p>
+        </span>
       </footer>
     </div>
   );
@@ -184,7 +199,9 @@ function CsvImport({
           onChange={(e) => setText(e.target.value)}
           placeholder={`${CSV_HEADER}\nMy Stream,2026-09-20T09:15:00Z,pH,7.2,pH,Meena,measured,clear day,,`}
         />
-        <button onClick={() => onImport(text)}>Import pasted text</button>
+        <button className="secondary" onClick={() => onImport(text)}>
+          <Import size={15} strokeWidth={2.4} /> Import pasted text
+        </button>
       </details>
       {skipped.length > 0 && (
         <ul className="skipped">

@@ -1,3 +1,4 @@
+import { ArrowLeftRight, Table2 } from 'lucide-react';
 import type { ReviewedObservation } from '../lib/types';
 import { canonicalUnit } from '../lib/units';
 import { PARAMETER_LABELS } from '../lib/types';
@@ -11,17 +12,17 @@ const ROWS: { from: string; to: string; why: string }[] = [
   { from: 'Human approval', to: 'Observation.status = final', why: 'Only records a person approved become "final".' },
 ];
 
-export default function MappingPreview({ records }: { records: ReviewedObservation[] }) {
+export function MappingPreview({ records }: { records: ReviewedObservation[] }) {
   const approved = records.filter((r) => r.status === 'approved');
   return (
     <div>
       <div className="panel">
-        <h2>How a citizen record becomes a standards record</h2>
+        <h2><ArrowLeftRight size={19} className="ic" /> How a citizen record becomes a standards record</h2>
         <p>
           This is the exact translation the export performs. Nothing is added, guessed, or hidden:
           each field in the FHIR record comes from a field the citizen or reviewer supplied.
         </p>
-        <table>
+        <div className="table-wrap"><table>
           <thead>
             <tr><th>Citizen input</th><th>Standards field (FHIR R4)</th><th>Why it matters</th></tr>
           </thead>
@@ -30,14 +31,14 @@ export default function MappingPreview({ records }: { records: ReviewedObservati
               <tr key={r.from}><td>{r.from}</td><td><code>{r.to}</code></td><td>{r.why}</td></tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       </div>
       <div className="panel">
-        <h2>Approved records ready for translation ({approved.length})</h2>
+        <h2><Table2 size={19} className="ic" /> Approved records ready for translation ({approved.length})</h2>
         {approved.length === 0 ? (
           <p>No approved records yet. Approve records in step 2 and they will appear here.</p>
         ) : (
-          <table>
+          <div className="table-wrap"><table>
             <thead>
               <tr><th>Site</th><th>Parameter</th><th>Entered as</th><th>Becomes</th><th>By</th><th>When</th></tr>
             </thead>
@@ -57,7 +58,7 @@ export default function MappingPreview({ records }: { records: ReviewedObservati
                 );
               })}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
     </div>

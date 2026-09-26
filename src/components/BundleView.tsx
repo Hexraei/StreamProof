@@ -1,3 +1,4 @@
+import { FileDown, Copy, Braces } from 'lucide-react';
 import type { FhirBundle } from '../lib/fhir';
 
 interface Props {
@@ -6,7 +7,7 @@ interface Props {
   pendingBlocked: number;
 }
 
-export default function BundleView({ bundle, counts, pendingBlocked }: Props) {
+export function BundleView({ bundle, counts, pendingBlocked }: Props) {
   const json = bundle ? JSON.stringify(bundle, null, 2) : '';
 
   const download = () => {
@@ -23,7 +24,7 @@ export default function BundleView({ bundle, counts, pendingBlocked }: Props) {
   return (
     <div>
       <div className="panel">
-        <h2>Export summary</h2>
+        <h2><FileDown size={19} className="ic" /> Export summary</h2>
         <ul className="summary">
           <li><strong>{counts.approved}</strong> approved records - these are in the export</li>
           <li><strong>{counts.rejected}</strong> rejected by a human reviewer - excluded</li>
@@ -35,14 +36,14 @@ export default function BundleView({ bundle, counts, pendingBlocked }: Props) {
         {!bundle && <p>Approve at least one record in step 2 to build an export.</p>}
         {bundle && (
           <div className="card-actions">
-            <button onClick={download}>Download the Bundle (JSON)</button>
-            <button onClick={() => navigator.clipboard.writeText(json)}>Copy to clipboard</button>
+            <button onClick={download}><FileDown size={16} strokeWidth={2.4} /> Download the Bundle (JSON)</button>
+            <button className="secondary" onClick={() => navigator.clipboard.writeText(json)}><Copy size={15} strokeWidth={2.4} /> Copy to clipboard</button>
           </div>
         )}
       </div>
       {bundle && (
         <div className="panel">
-          <h2>The standards record (FHIR R4 Bundle)</h2>
+          <h2><Braces size={19} className="ic" /> The standards record (FHIR R4 Bundle)</h2>
           <p className="hint">
             This file can be handed to any system that reads FHIR, the same standard hospitals and
             public-health platforms use. The tag at the top states plainly: prototype aligned with a

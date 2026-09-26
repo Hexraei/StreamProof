@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PlusCircle } from 'lucide-react';
 import type { Parameter, RawObservation } from '../lib/types';
 
 const PARAMS: { value: Parameter; label: string; unitHint: string }[] = [
@@ -7,7 +8,7 @@ const PARAMS: { value: Parameter; label: string; unitHint: string }[] = [
   { value: 'conductivity', label: 'Conductivity', unitHint: 'µS/cm' },
 ];
 
-export default function ObservationForm({ onAdd }: { onAdd: (rec: Omit<RawObservation, 'id'>) => void }) {
+export function ObservationForm({ onAdd }: { onAdd: (rec: Omit<RawObservation, 'id'>) => void }) {
   const [siteName, setSiteName] = useState('');
   const [observedAt, setObservedAt] = useState('');
   const [parameter, setParameter] = useState<Parameter>('ph');
@@ -41,10 +42,16 @@ export default function ObservationForm({ onAdd }: { onAdd: (rec: Omit<RawObserv
         Where was the water measured?
         <input value={siteName} onChange={(e) => setSiteName(e.target.value)} placeholder="e.g. Adyar River, near the footbridge" />
       </label>
-      <label>
-        When?
-        <input type="datetime-local" value={observedAt} onChange={(e) => setObservedAt(e.target.value)} />
-      </label>
+      <div className="row">
+        <label>
+          When?
+          <input type="datetime-local" value={observedAt} onChange={(e) => setObservedAt(e.target.value)} />
+        </label>
+        <label>
+          Who measured it?
+          <input value={observer} onChange={(e) => setObserver(e.target.value)} placeholder="e.g. Meena / Green Club" />
+        </label>
+      </div>
       <label>
         What was measured?
         <select
@@ -71,14 +78,13 @@ export default function ObservationForm({ onAdd }: { onAdd: (rec: Omit<RawObserv
         </label>
       </div>
       <label>
-        Who measured it?
-        <input value={observer} onChange={(e) => setObserver(e.target.value)} placeholder="Name or group, e.g. Meena / Green Club" />
-      </label>
-      <label>
         Notes (optional)
         <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything a reviewer should know" />
       </label>
-      <button onClick={submit}>{added ? 'Added - check the Review step' : 'Add measurement'}</button>
+      <button onClick={submit}>
+        <PlusCircle size={17} strokeWidth={2.4} />
+        {added ? 'Added - check the Review step' : 'Add measurement'}
+      </button>
     </div>
   );
 }
