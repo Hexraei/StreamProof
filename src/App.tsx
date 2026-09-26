@@ -88,7 +88,7 @@ export default function App() {
         </div>
       </header>
 
-      <nav aria-label="Workflow steps" className="mx-4 mt-4 grid grid-cols-2 gap-1 rounded-lg border border-line bg-card p-1 min-[560px]:grid-cols-4 min-[900px]:mx-7">
+      <nav aria-label="Workflow steps" className="mx-4 mt-4 grid grid-cols-2 gap-px border border-line bg-line min-[560px]:grid-cols-4 min-[900px]:mx-7">
         {STEPS.map((s, i) => {
           const Icon = s.icon;
           const active = step === s.id;
@@ -97,15 +97,15 @@ export default function App() {
               key={s.id}
               onClick={() => setStep(s.id)}
               className={cn(
-                'relative flex items-center justify-center gap-1.5 rounded-md px-2 py-2.5 text-[13px] font-semibold transition-colors',
-                active ? 'bg-primary-deep text-white' : 'text-muted hover:bg-primary-soft hover:text-primary-deep'
+                'relative flex items-center justify-center gap-1.5 bg-card px-2 py-3 text-[13px] font-semibold transition-colors',
+                active ? 'text-primary-deep after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary' : 'text-muted hover:bg-background hover:text-ink'
               )}
             >
-              <span className={cn('font-display text-[11px] font-bold', active ? 'text-white/75' : 'text-muted/60')}>{i + 1}</span>
+              <span className={cn('font-mono text-[11px] font-bold', active ? 'text-primary' : 'text-muted/60')}>{i + 1}</span>
               <Icon size={14} strokeWidth={2.4} />
               <span className="truncate">{s.label}</span>
               {s.id === 'review' && counts.pending > 0 && (
-                <span className="grid h-5 min-w-5 place-items-center rounded-full bg-bad px-1 text-[11px] font-bold text-white">
+                <span className="font-mono text-[11px] font-bold text-bad">
                   {counts.pending}
                 </span>
               )}
@@ -116,7 +116,7 @@ export default function App() {
 
       <main className="flex flex-1 flex-col gap-4 px-4 py-4 pb-10 min-[900px]:px-7 min-[900px]:py-5">
         {step === 'add' && (
-          <div className="grid items-start gap-4 min-[900px]:grid-cols-[3fr_2fr]">
+          <div className="grid gap-4 min-[900px]:grid-cols-[3fr_2fr]">
             <Card className="min-[900px]:row-span-2">
               <CardHeader>
                 <CardTitle><PencilLine size={18} className="text-primary" /> Add one measurement</CardTitle>
@@ -174,7 +174,7 @@ function CsvImport({ onImport, skipped }: { onImport: (text: string) => void; sk
   return (
     <div className="flex flex-col gap-3">
       <p className="text-[13px] text-muted">
-        Expected columns: <code className="rounded bg-primary-soft px-1.5 py-0.5 font-mono text-[11px] text-primary-ink break-all">{CSV_HEADER}</code>
+        Expected columns: <code className="rounded-sm bg-primary-soft px-1.5 py-0.5 font-mono text-[11px] text-primary-ink break-all">{CSV_HEADER}</code>
       </p>
       <input
         type="file"
@@ -183,7 +183,7 @@ function CsvImport({ onImport, skipped }: { onImport: (text: string) => void; sk
           const f = e.target.files?.[0];
           if (f) onImport(await f.text());
         }}
-        className="w-full min-w-0 cursor-pointer rounded-lg border-[1.5px] border-dashed border-line bg-primary-soft/50 px-3.5 py-3 text-sm text-ink2 file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
+        className="w-full min-w-0 cursor-pointer rounded-sm border-[1.5px] border-dashed border-line bg-primary-soft/50 px-3.5 py-3 text-sm text-ink2 file:mr-3 file:rounded-sm file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
       />
       <details className="group">
         <summary className="cursor-pointer text-sm font-semibold text-primary-deep">or paste CSV text</summary>

@@ -40,7 +40,7 @@ export function BundleView({ bundle, counts, pendingBlocked }: Props) {
           <ul className="flex flex-col gap-2">
             {stats.map((s, i) => (
               <li key={i} className="flex items-center gap-2.5 text-sm text-ink2">
-                <strong className="min-w-7 rounded-lg bg-primary-soft px-1.5 py-0.5 text-center font-display text-[15px] font-bold text-primary-deep">{s.n}</strong>
+                <strong className="min-w-7 rounded-sm bg-primary-soft px-1.5 py-0.5 text-center font-display text-[15px] font-bold text-primary-deep">{s.n}</strong>
                 {s.label}
               </li>
             ))}
@@ -67,7 +67,7 @@ export function BundleView({ bundle, counts, pendingBlocked }: Props) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <pre className="max-h-[460px] overflow-auto rounded-lg bg-[#0f2620] p-4 font-mono text-xs leading-relaxed text-[#c9ebe0]">{json}</pre>
+            <pre className="max-h-[460px] overflow-auto rounded-sm bg-[#0f2620] p-4 font-mono text-xs leading-relaxed text-[#c9ebe0]">{json}</pre>
           </CardContent>
         </Card>
       )}

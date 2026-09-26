@@ -39,7 +39,7 @@ export function MappingPreview({ records }: { records: ReviewedObservation[] }) 
               {ROWS.map((r) => (
                 <TableRow key={r.from}>
                   <TableCell>{r.from}</TableCell>
-                  <TableCell><code className="rounded-md bg-primary-soft px-1.5 py-0.5 font-mono text-xs text-primary-ink">{r.to}</code></TableCell>
+                  <TableCell><code className="rounded-sm bg-primary-soft px-1.5 py-0.5 font-mono text-xs text-primary-ink">{r.to}</code></TableCell>
                   <TableCell>{r.why}</TableCell>
                 </TableRow>
               ))}

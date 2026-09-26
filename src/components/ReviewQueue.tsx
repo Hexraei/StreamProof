@@ -16,16 +16,10 @@ interface Props {
   onRemove: (id: string) => void;
 }
 
-const accent: Record<ReviewStatus, string> = {
-  pending: 'border-l-warn',
-  approved: 'border-l-ok',
-  rejected: 'border-l-bad opacity-80',
-};
-
-const statusDot: Record<ReviewStatus, string> = {
-  pending: 'bg-warn',
-  approved: 'bg-ok',
-  rejected: 'bg-bad',
+const statusText: Record<ReviewStatus, string> = {
+  pending: 'text-warn',
+  approved: 'text-ok',
+  rejected: 'text-bad',
 };
 
 export function ReviewQueue({ records, onUpdate, onSetStatus, onRemove }: Props) {
@@ -41,7 +35,7 @@ export function ReviewQueue({ records, onUpdate, onSetStatus, onRemove }: Props)
     );
   }
   return (
-    <div className="grid items-start gap-4 min-[900px]:grid-cols-2 min-[1280px]:grid-cols-3">
+    <div className="grid gap-4 min-[900px]:grid-cols-2 min-[1280px]:grid-cols-3">
       <Card className="min-[900px]:col-span-full">
         <CardContent className="flex items-start gap-3 py-4">
           <ListChecks size={19} className="mt-0.5 shrink-0 text-primary" />
@@ -57,29 +51,29 @@ export function ReviewQueue({ records, onUpdate, onSetStatus, onRemove }: Props)
         const sourceNote =
           rec.source === 'manual' ? 'typed in' : rec.source === 'csv' ? 'from CSV' : rec.source === 'reference-sample' ? 'reference sample' : 'synthetic demo';
         return (
-          <Card key={rec.id} className={cn('border-l-4', accent[rec.status])}>
+          <Card key={rec.id}>
             <CardContent className="flex flex-col gap-3 py-4">
               <div className="flex items-center gap-2">
                 <strong className="font-display text-[15px]">{PARAMETER_LABELS[rec.parameter]}</strong>
                 <span className="text-xs text-muted">{sourceNote}</span>
-                <span className="ml-auto inline-flex items-center gap-1.5 text-xs text-muted">
-                  <span className={cn('h-1.5 w-1.5 rounded-full', statusDot[rec.status])} />
+                <span className={cn('ml-auto text-[11px] font-bold uppercase tracking-[0.08em]', statusText[rec.status])}>
                   {rec.status}
                 </span>
               </div>
-              <div className="flex items-center gap-x-3 gap-y-1 text-[13px] text-ink2">
-                <span className="inline-flex items-center gap-1">
-                  <MapPin size={12} className="text-muted" /> {rec.siteName || 'no site'}
+              <div className="flex items-center gap-2 text-[13px] text-ink2">
+                <span className="inline-flex min-w-0 flex-1 items-center gap-1">
+                  <MapPin size={12} className="shrink-0 text-muted" />
+                  <span className="truncate">{rec.siteName || 'no site'}</span>
                 </span>
-                <span className="inline-flex items-center gap-1 text-xs text-muted">
-                  <Calendar size={12} /> {rec.observedAt ? rec.observedAt.replace('T', ' ') : 'no date'}
+                <span className="inline-flex shrink-0 items-center gap-1 font-mono text-xs text-muted">
+                  <Calendar size={12} /> {rec.observedAt ? rec.observedAt.slice(5, 16).replace('T', ' ') : 'no date'}
                 </span>
               </div>
               <div className="flex items-end gap-2.5">
                 <Label className="flex-1">
                   Value
                   <Input
-                    className="h-12 font-display text-2xl font-bold tracking-tight"
+                    className="h-12 font-mono text-2xl font-bold tracking-tight"
                     value={rec.value ?? ''}
                     onChange={(e) => onUpdate(rec.id, { value: e.target.value === '' ? null : Number(e.target.value) })}
                   />
@@ -87,7 +81,7 @@ export function ReviewQueue({ records, onUpdate, onSetStatus, onRemove }: Props)
                 <Label className="w-28 shrink-0">
                   Unit
                   <Input
-                    className={cn('h-12', rec.unit === '' && 'border-dashed text-muted italic placeholder:text-muted placeholder:italic')}
+                    className={cn('h-12 font-mono', rec.unit === '' && 'border-dashed text-muted italic placeholder:text-muted placeholder:italic')}
                     placeholder={rec.unit === '' ? 'missing' : undefined}
                     value={rec.unit}
                     onChange={(e) => onUpdate(rec.id, { unit: e.target.value })}
@@ -117,13 +111,7 @@ export function ReviewQueue({ records, onUpdate, onSetStatus, onRemove }: Props)
               {rec.issues.length > 0 && (
                 <div className="flex flex-col gap-1.5 border-t border-line pt-2.5">
                   {rec.issues.map((iss, i) => (
-                    <p
-                      key={i}
-                      className={cn(
-                        'border-l-[3px] py-0.5 pl-2.5 text-[13px] leading-snug text-ink',
-                        iss.severity === 'error' ? 'border-l-bad' : 'border-l-warn'
-                      )}
-                    >
+                    <p key={i} className="py-0.5 text-[13px] leading-snug text-ink">
                       <strong className={cn('font-bold', iss.severity === 'error' ? 'text-bad' : 'text-warn')}>
                         {iss.severity === 'error' ? 'Blocked:' : 'Check:'}
                       </strong>{' '}
